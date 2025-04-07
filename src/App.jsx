@@ -1,3 +1,5 @@
+//khi làm next.js hay nhưng framework dùng ssr thì để ngăn chặn dark-mode flickering phải dùng import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
+//Link đọc: https://v5.mui.com/material-ui/experimental-api/css-theme-variables/migration/
 import Button from '@mui/material/Button'
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm'
 import ThreeDRotation from '@mui/icons-material/ThreeDRotation'
@@ -5,8 +7,6 @@ import HomeIcon from '@mui/icons-material/Home'
 import { pink } from '@mui/material/colors'
 import Typography from '@mui/material/Typography'
 import { useColorScheme } from '@mui/material/styles'
-//khi làm next.js hay nhưng framework dùng ssr thì để ngăn chặn dark-mode flickering phải dùng import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
-//Link đọc: https://v5.mui.com/material-ui/experimental-api/css-theme-variables/migration/
 
 function ModeToggle() {
   const { mode, setMode } = useColorScheme()
