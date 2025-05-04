@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box'
-import * as React from 'react'
+import React from 'react'
 import Button from '@mui/material/Button'
 import Menu from '@mui/material/Menu'
 import Divider from '@mui/material/Divider'
@@ -26,6 +26,7 @@ function Workspaces() {
   return (
     <Box>
       <Button
+        sx={{ color: 'white' }}
         id="basic-button-workspaces"
         aria-controls={open ? 'basic-menu-workspaces' : undefined}
         aria-haspopup="true"

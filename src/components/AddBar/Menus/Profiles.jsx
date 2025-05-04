@@ -33,7 +33,7 @@ function Profiles() {
           aria-expanded={open ? 'true' : undefined}
         >
           <Avatar
-            sx={{ width: 34, height: 34 }}
+            sx={{ width: 36, height: 36 }}
             alt='anh avata'
             src="https://www.manga-news.com/public/images/pix/dvd/5105/Frieren-anime-S1-character.jpg" />
         </IconButton>
