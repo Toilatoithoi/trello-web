@@ -8,9 +8,18 @@ import {
   MouseSensor,
   TouchSensor,
   useSensor,
-  useSensors
+  useSensors,
+  DragOverlay,
+  defaultDropAnimationSideEffects
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
+import Column from './ListColumns/Column/Column'
+import Card from './ListColumns/Column/ListCards/Card/Card'
+
+const ACTIVE_DRAG_ITEM_TYPE = {
+  COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
+  CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
+}
 
 function BoardContent({ board }) {
   // Nếu dùng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng mà con bug ưu tiên sử dụng mouseSensor và touchSensor
@@ -28,11 +37,24 @@ function BoardContent({ board }) {
 
   const [orderColumnsState, setOrderColumnsState] = useState([])
 
+  // Cùng một thời điểm chỉ có một phần tử đang được kéo (column hoặc card)
+  const [activeDragIyemId, setActiveDragItemId] = useState(null)
+  const [activeDragIyemType, setActiveDragItemType] = useState(null)
+  const [activeDragIyemData, setActiveDragItemData] = useState(null)
+
   useEffect(() => {
     const orderColumns = mapOrder(board?.columns, board.columnOrderIds, '_id')
     setOrderColumnsState(orderColumns)
   }, [board])
 
+  // Trigger khi bắt đầu kéo (drag) một phần tử
+  const handleDragStart = (event) => {
+    setActiveDragItemId(event?.active?.id)
+    setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
+    setActiveDragItemData(event?.active?.data?.current)
+  }
+
+  // Trigger khi kết thúc một hành động kéo (drag) một phần tử => hành động thả (drop)
   const handleDragEnd = (event) => {
     const { active, over } = event
 
@@ -53,10 +75,31 @@ function BoardContent({ board }) {
       // Cập nhật lại state columns ban đầu sau khi đã kéo thả
       setOrderColumnsState(dndOrderColumns)
     }
+
+    setActiveDragItemId(null)
+    setActiveDragItemType(null)
+    setActiveDragItemData(null)
+  }
+
+  /**
+   *  Animation khi thả (Drop) phần tử - Test bằng cách kéo xong thả trực tiếp và nhìn phần tử giữ chỗ Overlap
+   * (Video 32)
+   */
+  const customDropAnimation = {
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: {
+        active: {
+          opacity: '0.5'
+        }
+      }
+    })
   }
 
   return (
-    <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}>
       <Box sx={{
         bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
         width: '100%',
@@ -65,6 +108,11 @@ function BoardContent({ board }) {
       }}
       >
         <ListColumns columns={orderColumnsState} />
+        <DragOverlay dropAnimation={customDropAnimation}>
+          {!activeDragIyemType && null}
+          {(activeDragIyemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragIyemData} />}
+          {(activeDragIyemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <Card card={activeDragIyemData} />}
+        </DragOverlay>
       </Box>
     </DndContext>
   )
