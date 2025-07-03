@@ -3,7 +3,7 @@ import Container from '@mui/material/Container'
 import AppBar from '~/components/AddBar/AddBar'
 import BoardBar from './BoardBar/BoardBar'
 import BoardContent from './BoardContent/BoardContent'
-// import { mockData } from '~/api/mock-data'
+import { mockData } from '~/api/mock-data'
 import { fecthBoardDetailsAPI } from '~/api'
 
 function Board() {
@@ -23,8 +23,8 @@ function Board() {
     <>
       <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
         <AppBar />
-        <BoardBar board={board} />
-        <BoardContent board={board} />
+        <BoardBar board={mockData?.board} />
+        <BoardContent board={mockData?.board} />
       </ Container>
     </>
   )
