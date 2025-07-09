@@ -4,9 +4,13 @@ import AppBar from '~/components/AddBar/AddBar'
 import BoardBar from './BoardBar/BoardBar'
 import BoardContent from './BoardContent/BoardContent'
 // import { mockData } from '~/api/mock-data'
-import { fecthBoardDetailsAPI, createNewColumnAPI, createNewCardAPI, updateBoardDetailsAPI } from '~/api'
+import { fecthBoardDetailsAPI, createNewColumnAPI, createNewCardAPI, updateBoardDetailsAPI, updateColumnDetailsAPI } from '~/api'
 import { generatePlaceholderCard } from '~/utils/formatters'
 import { isEmpty } from 'lodash'
+import { mapOrder } from '~/utils/sorts'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import CircularProgress from '@mui/material/CircularProgress'
 
 function Board() {
   const [board, setBoard] = useState(null)
@@ -17,13 +21,22 @@ function Board() {
     // Call API
     // Nếu 1 biến thì không cần (board) chỉ cần board
     fecthBoardDetailsAPI(boardId).then(board => {
-      // Khi F5 trang web thì cần xử lý vấn đề kéo thả vào một column rỗng (Nhớ lại video 37.2, code hiện tại là video 69)
+      board.column = mapOrder(board?.columns, board.columnOrderIds, '_id')
+
       board.columns.forEach(column => {
+        // Khi F5 trang web thì cần xử lý vấn đề kéo thả vào một column rỗng (Nhớ lại video 37.2, code hiện tại là video 69)
         if (isEmpty(column.cards)) {
           column.cards = [generatePlaceholderCard(column)]
           column.cardOrderIds = [generatePlaceholderCard(column)._id]
         }
+        else {
+          // Sắp xếp thứ tự các cards luôn ở đây trước khi đưa dữ liệu xuống bên dưới các component con (video 71 đã giải thích lý do ở phần fix bug quan trọng)
+          // Do mảng card trong column chưa được cập nhật lại vị trí index của card dù cardOrderIds đã được cập nhật, lỗi này chỉ xảy ra lần đầu tiên kéo thả card
+          column.cards = mapOrder(column.cards, column.cardOrderIds, '_id')
+        }
       })
+
+      console.log('full board: ', board)
       setBoard(board)
     })
   }, [])
@@ -55,12 +68,12 @@ function Board() {
       boardId: board._id
     })
 
-    console.log('createdCard: ', createdCard)
+    // console.log('createdCard: ', createdCard)
 
     // cập nhập lại state board
     // Phía Front-end chúng ta phải tự làm đúng lại state data board (thay vì phải gọi lại api fetchBoardDetailsAPI)
     // Lưu ý: cách làm này phụ thuộc vào tùy lựa chọn và đặc thù dự án, có nơi thì BE sẽ hỗ trợ trả về luôn toàn bộ Board dù đây có là api tạo Column hay Card đi chăng nữa. Lúc này FE sẽ nhàn hơn.
-    const newBoard = { ... board }
+    const newBoard = { ...board }
     const columnToUpdate = newBoard.columns.find(column => column._id === createdCard.columnId)
     if (columnToUpdate) {
       columnToUpdate.cards.push(createdCard)
@@ -69,7 +82,10 @@ function Board() {
     }
   }
 
-  // Function này có nhiệm vụ gọi API và xử lý khi kéo thả
+  /**
+   * Function này có nhiệm vụ gọi API và xử lý khi kéo thả Column xong xuôi
+   * Chỉ cần gọi API để cập nhật mảng cardOrderIds của Board chứa nó (thay đổi vị trí trong board)
+   */
   const moveColumns = async (dndOrderColumns) => {
     // Update cho chuần dữ liệu state Board
     const dndOrderedColumnIds = dndOrderColumns.map(c => c._id)
@@ -80,7 +96,40 @@ function Board() {
 
     // Gọi API update Board
     updateBoardDetailsAPI(newBoard._id, { columnOrderIds: newBoard.columnOrderIds })
+  }
 
+  /**
+   * Khi di chuyển card trong cùng Column:
+   * Chỉ cần gọi API để cập nhật mảng cardOrderIds của Column chứa nó (thay đổi vị trí trong mảng)
+   */
+  const moveCardInTheSameColumn = (dndOrderCards, dndOrderedCardIds, columnId) => {
+    // Update cho chuần dữ liệu state Board
+    const newBoard = { ...board }
+    const columnToUpdate = newBoard.columns.find(column => column._id === columnId)
+    if (columnToUpdate) {
+      columnToUpdate.cards = dndOrderCards
+      columnToUpdate.cardOrderIds = dndOrderedCardIds
+    }
+    setBoard(newBoard)
+
+    // Gọi API update Board
+    // updateColumnDetailsAPI(columnId, { cardOrderIds: columnToUpdate.cardOrderIds })
+  }
+
+  if (!board) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+        width: '100vw',
+        height: '100vh'
+      }}>
+        <CircularProgress />
+        <Typography>Loading Board...</Typography>
+      </Box>
+    )
   }
 
   return (
@@ -93,6 +142,7 @@ function Board() {
           createNewColumn={createNewColumn}
           createNewCard={createNewCard}
           moveColumns={moveColumns}
+          moveCardInTheSameColumn={moveCardInTheSameColumn}
         />
       </ Container>
     </>
