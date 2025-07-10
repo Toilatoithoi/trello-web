@@ -29,7 +29,14 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn }) {
+function BoardContent({
+  board,
+  createNewColumn,
+  createNewCard,
+  moveColumns,
+  moveCardInTheSameColumn,
+  moveCardToDifferentColumn
+}) {
   // Nếu dùng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng mà con bug ưu tiên sử dụng mouseSensor và touchSensor
   // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
 
@@ -65,7 +72,7 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
     return orderColumnsState.find(column => column.cards.map(card => card._id)?.includes(cardId))
   }
 
-  // Function chung sử lý việc Cập nhật lại state trong trường hợp di chuyển Card giữa các Column khác nhau
+  // Khởi tạo Function chung sử lý việc Cập nhật lại state trong trường hợp di chuyển Card giữa các Column khác nhau
   const moveCardBetweenDifferentColumns = (
     overColumn,
     overCardId,
@@ -73,7 +80,8 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
     over,
     activeColumn,
     activeDraggingCardId,
-    activeDraggingCardData
+    activeDraggingCardData,
+    triggerFrom
   ) => {
     setOrderColumnsState(preColumns => {
       // Tìm vị trí (index) của cái overCard trong column đích (nơi mà activeCard sắp được thả)
@@ -125,6 +133,23 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
       }
 
+      // Nếu function này được gọi tưgf handleDragEnd nghĩa là kéo thả xong, lúc này mới xử lỳ gọi API 1 lần ở đây
+      if (triggerFrom === 'handleDragEnd') {
+        /**
+         * Gọi lên props function moveCardToDifferentColumn nằm ở component cha cao nhất (boards/_id.jsx)
+         * Lưu ý: Về sau ở học phần MERN Stack Advance nâng cao học trực tiếp mình sẽ với mình thì chúng ta sẽ đưa dữ liệu Board ra ngoài Redux Global Store,
+         * và lúc này chúng ta có thể gọi luôn API ở đây là xong thay vì phải lần lượt gọi ngược lên những component cha phía bên trên. (Đối với component con nằm càng sâu thì càng khổ :D)
+         * Với việc sử dụng Redux như vậy thì code sẽ Clean chuần chỉnh hơn rất nhiều.
+        */
+        // Phải dùng tới activeDragItemData.columnId hoặc tốt nhất là oldColumnWhenDraggingCard._id (set vào state từ bước handleDragStart) chứ không phải activeData trong scope handleDragEnd này vì sau khi đi qua onDragover và tới đây là state của card đã bị cập nhật một lần rồi.
+        moveCardToDifferentColumn(
+          activeDraggingCardId,
+          oldColumnWhenDraggingCard._id,
+          nextOverColumn._id,
+          nextColumns
+        )
+      }
+
       return nextColumns
     })
   }
@@ -142,7 +167,7 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
   }
 
   // Trigger trong quá trình kéo (drag) một phần tử
-  const handleDragOver = (event) => {
+  const handleDragOver = (event) => { 
     // Không làm gì thêm nếu kéo column
     if (activeDragIyemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
       return
@@ -176,7 +201,8 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
         over,
         activeColumn,
         activeDraggingCardId,
-        activeDraggingCardData
+        activeDraggingCardData,
+        'handleDragOver'
       )
     }
   }
@@ -218,7 +244,8 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
           over,
           activeColumn,
           activeDraggingCardId,
-          activeDraggingCardData
+          activeDraggingCardData,
+          'handleDragEnd'
         )
       } else {
         // Hành động kéo thả card trong cùng một cái column
