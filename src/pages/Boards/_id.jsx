@@ -30,6 +30,7 @@ function Board() {
     // Call API
     // Nếu 1 biến thì không cần (board) chỉ cần board
     fecthBoardDetailsAPI(boardId).then(board => {
+      // Sắp xếp thứ tự các cards luôn ở đây trước khi đưa dữ liệu xuống bên dưới các component con (video 71 đã giải thích lý do ở phần fix bug quan trọng)
       board.column = mapOrder(board?.columns, board.columnOrderIds, '_id')
 
       board.columns.forEach(column => {
