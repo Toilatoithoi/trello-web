@@ -31,12 +31,9 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 
 function BoardContent({
   board,
-  createNewColumn,
-  createNewCard,
   moveColumns,
   moveCardInTheSameColumn,
-  moveCardToDifferentColumn,
-  deleteColumnDetails
+  moveCardToDifferentColumn
 }) {
   // Nếu dùng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng mà con bug ưu tiên sử dụng mouseSensor và touchSensor
   // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
@@ -168,7 +165,7 @@ function BoardContent({
   }
 
   // Trigger trong quá trình kéo (drag) một phần tử
-  const handleDragOver = (event) => { 
+  const handleDragOver = (event) => {
     // Không làm gì thêm nếu kéo column
     if (activeDragIyemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
       return
@@ -399,9 +396,6 @@ function BoardContent({
       >
         <ListColumns
           columns={orderColumnsState}
-          createNewColumn={createNewColumn}
-          createNewCard={createNewCard}
-          deleteColumnDetails={deleteColumnDetails}
         />
         <DragOverlay dropAnimation={customDropAnimation}>
           {!activeDragIyemType && null}
