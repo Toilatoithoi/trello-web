@@ -1,15 +1,31 @@
 //khi làm next.js hay nhưng framework dùng ssr thì để ngăn chặn dark-mode flickering phải dùng import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 //Link đọc: https://v5.mui.com/material-ui/experimental-api/css-theme-variables/migration/
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Board from '~/pages/Boards/_id'
+import NotFound from '~/pages/404/NotFound'
+import Auth from '~/pages/Auth/Auth'
 
 function App() {
 
   return (
-    <>
-      {/* React Router Dom / boards / boards/{board_id}*/}
+    <Routes>
+      {/* Redirect Route */}
+      <Route path='/' element={
+        // ở đây cần replace giá trị true để nó thay thế route /, có thể hiểu là route / sẽ không còn nằm trong history của Browser
+        // Thực hành dễ hiều hơn bằng cách nhấn Go Home từ trang 404 xong thứ quay lại bằng nút back của trình duyệt giữa 2 trường hợp có replace hoặc không có.
+        <Navigate to="/boards/6862bc9b05d187d673fa41dc" replace={true} />
+      }/>
+
       {/* Board Details*/}
-      <Board />
-    </>
+      <Route path='/boards/:boardId' element={ <Board />} />
+
+      {/* Authentication */}
+      <Route path='/login' element={<Auth />} />
+      <Route path='/register' element={<Auth />} />
+
+      {/* 404 not found page */}
+      <Route path='*' element={<NotFound />} />
+    </Routes>
   )
 }
 
