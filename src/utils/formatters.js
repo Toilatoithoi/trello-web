@@ -19,3 +19,22 @@ export const generatePlaceholderCard = (column) => {
     FE_PlaceholderCard: true
   }
 }
+
+//Kỹ thuật dùng css pointer-event-đề chận-user-spam click tại bất kỳ chi nào có hành động click-gọi-api
+//// Đây là một kỹ thuật rất hay tận dụng Axios Interceptors và CS5 Pointer-events đề chỉ phải viết code xửLý một lần cho toàn bộ dự án
+// Cách sử dụng: Với tất cả các link hoặc button mà có hành động gọi api thì thêm class "interceptor-loading" cho nó là xong.
+export const interceptorLoadingElements = (calling) => {
+  //-DOM-Lây ra toàn bộ phần tử trên page hiện tại có className là 'interceptor-loading'
+  const elements = document.querySelectorAll('.interceptor-loading')
+  for (let i = 0; i < elements.length; i++) {
+    if (calling) {
+      // Nều đang trong thời gian chờ gọi API (calling true) thì sẽ làm mờ phần tử và chấn click bằng css pointer-events
+      elements[i].style.opacity = '0.5'
+      elements[i].style.pointerEvents = 'none'
+    } else {
+      // Ngược lại thì trả về như ban đầu, không làm gì cả
+      elements[i].style.opacity = 'initial'
+      elements[i].style.pointerEvents = 'initial'
+    }
+  }
+}
