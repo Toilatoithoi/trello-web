@@ -13,7 +13,7 @@ function AccountVerification() {
   const { email, token } = Object.fromEntries([...searchParams])
 
   // Tạo một biến state để biết được là đã verify tài khoản thành công hay chưa
-  const [verified, setVerified] = useState(true)
+  const [verified, setVerified] = useState(false)
 
   // Gọi API để verify tài khoản
   useEffect(() => {
