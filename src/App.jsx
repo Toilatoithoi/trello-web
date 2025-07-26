@@ -1,12 +1,29 @@
 //khi làm next.js hay nhưng framework dùng ssr thì để ngăn chặn dark-mode flickering phải dùng import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 //Link đọc: https://v5.mui.com/material-ui/experimental-api/css-theme-variables/migration/
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import Board from '~/pages/Boards/_id'
 import NotFound from '~/pages/404/NotFound'
 import Auth from '~/pages/Auth/Auth'
 import AccountVerification from './pages/Auth/AccountVerification'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+
+/**
+  * Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới cho truy cập
+  * Sử dụng <Outlet /> của react-router-dom để hiển thị các Child Route (xem cách sử dụng trong App() bên dưới)
+  * https://reactrouter.com/en/main/components/outlet
+  * Một bài hướng dẫn khá đầy đủ:
+  * https://www.robinwieruch.de/react-router-private-routes/
+*/
+
+const ProtectedRoutes = ({ user }) => {
+  console.log('user: ', user)
+  if (!user) return <Navigate to='/login' replace={true} />
+  return <Outlet />
+}
 
 function App() {
+  const currentUser = useSelector(selectCurrentUser)
 
   return (
     <Routes>
@@ -15,10 +32,15 @@ function App() {
         // ở đây cần replace giá trị true để nó thay thế route /, có thể hiểu là route / sẽ không còn nằm trong history của Browser
         // Thực hành dễ hiều hơn bằng cách nhấn Go Home từ trang 404 xong thứ quay lại bằng nút back của trình duyệt giữa 2 trường hợp có replace hoặc không có.
         <Navigate to="/boards/6862bc9b05d187d673fa41dc" replace={true} />
-      }/>
+      } />
 
-      {/* Board Details*/}
-      <Route path='/boards/:boardId' element={ <Board />} />
+      {/* Projected Routes (Hiểu đơn giản trong dự án chúng ta là những route chỉ cho truy cập sau khi đã login) */}
+      <Route element={<ProtectedRoutes user={currentUser} />}>
+        {/* <Outlet /> của react-router-dom sẽ chạy vào các child route trong này */}
+
+        {/* Board Details*/}
+        <Route path='/boards/:boardId' element={<Board />} />
+      </Route>
 
       {/* Authentication */}
       <Route path='/login' element={<Auth />} />
