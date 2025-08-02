@@ -31,6 +31,14 @@ export const logoutUserAPI = createAsyncThunk(
   }
 )
 
+export const updateUserAPI = createAsyncThunk(
+  'user/updateUserAPI',
+  async (data) => {
+    const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/users/update`, data)
+    return response.data
+  }
+)
+
 // Khởi tạo một cái Slide trong kho lưu trữ - Redux Store
 export const userSlice = createSlice({
   name: 'user',
@@ -51,6 +59,11 @@ export const userSlice = createSlice({
        * Kết hợp ProtectedRoute đã làm ở App.js => code sẽ điều hướng chuẩn về trang Login
        */
       state.currentUser = null
+    })
+
+    builder.addCase(updateUserAPI.fulfilled, (state, action) => {
+      const user = action.payload
+      state.currentUser = user
     })
   }
 })
