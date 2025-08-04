@@ -19,7 +19,7 @@ import {
   PASSWORD_COFIRMATION_RULE_MESSAGE
 } from '~/utils/validators'
 import FieldErrorAlert from '~/components/Form/FieldErrorAlert'
-import { registerUserAPI } from '~/api'
+import { registerUserAPI } from '~/apis'
 import { toast } from 'react-toastify'
 
 function RegisterForm() {

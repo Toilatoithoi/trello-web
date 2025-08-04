@@ -8,7 +8,7 @@ import {
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
   moveCardToDifferentColumnAPI
-} from '~/api'
+} from '~/apis'
 import { cloneDeep } from 'lodash'
 import {
   fecthBoardDetailsAPI,

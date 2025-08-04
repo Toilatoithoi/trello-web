@@ -23,7 +23,7 @@ import ListCards from './ListCards/ListCards'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useConfirm } from 'material-ui-confirm'
-import { createNewCardAPI, deleteColumnDetailsAPI } from '~/api'
+import { createNewCardAPI, deleteColumnDetailsAPI } from '~/apis'
 import { cloneDeep } from 'lodash'
 import {
   updateCurrentActiveBoard,

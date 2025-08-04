@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { interceptorLoadingElements } from '~/utils/formatters'
-import { refreshTokenAPI } from '~/api'
+import { refreshTokenAPI } from '~/apis'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 
 /**

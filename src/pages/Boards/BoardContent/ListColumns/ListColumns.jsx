@@ -7,7 +7,7 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd'
 import TextField from '@mui/material/TextField'
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable'
 import CloseIcon from '@mui/icons-material/Close'
-import { createNewColumnAPI } from '~/api'
+import { createNewColumnAPI } from '~/apis'
 import { generatePlaceholderCard } from '~/utils/formatters'
 import { cloneDeep } from 'lodash'
 import {
