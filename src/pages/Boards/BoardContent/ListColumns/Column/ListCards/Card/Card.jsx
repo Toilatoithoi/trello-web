@@ -7,11 +7,15 @@ import CardMedia from '@mui/material/CardMedia'
 import GroupIcon from '@mui/icons-material/Group'
 import CommentIcon from '@mui/icons-material/Comment'
 import AttachmentIcon from '@mui/icons-material/Attachment'
-import { mapOrder } from '~/utils/sorts'
+
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useDispatch } from 'react-redux'
+import { updateCurrentActiveCard } from '~/redux/activeCard/activeCardSlice'
 
 function Card({ card }) {
+  const dispatch = useDispatch()
+
   const shouldShowCardActions = () => {
     return !!card?.memberIds?.length || !!card?.comments?.length || !!card?.attachments?.length
   }
@@ -34,8 +38,14 @@ function Card({ card }) {
     border: isDragging ? '1px solid #2ecc71' : undefined
   }
 
+  const setActiveCard = () => {
+    // Cập nhật data cho setActiveCard trong Redux
+    dispatch(updateCurrentActiveCard(card))
+  }
+
   return (
     <MuiCard
+      onClick={setActiveCard}
       ref={setNodeRef} style={dndKitCardStyles} {...attributes} {...listeners}
       sx={{
         cursor: 'pointer',
