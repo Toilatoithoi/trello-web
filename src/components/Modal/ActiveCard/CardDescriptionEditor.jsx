@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 
+// eslint-disable-next-line no-unused-vars
 const markdownValueExample = `
   *\`Markdown Content Example:\`*
 
@@ -22,7 +23,7 @@ const markdownValueExample = `
  * https://codesandbox.io/embed/markdown-editor-for-react-izdd67fontsize=14&hidenavigation=1&theme=dark
 */
 
-function CardDescriptionEditor() {
+function CardDescriptionEditor({ CardDescriptionProp, handleUpdateCardDescription }) {
   // Lấy giá trị 'dark', 'light' hoặc 'system' mode từ MUI đề support phần Markdown bên dưới:data-color-mode={mode}
   // https://www.npmjs.com/package/@uiw/react-md-editor#support-dark-modenight-mode
   const { mode } = useColorScheme()
@@ -30,11 +31,12 @@ function CardDescriptionEditor() {
   // State xử lý chế độ Edit và chế độ View
   const [markdownEditMode, setMarkdownEditMode] = useState(false)
   // State xử lý giá trị markdown khi chỉnh sửa
-  const [cardDescription, setCardDescription] = useState(markdownValueExample)
+  const [cardDescription, setCardDescription] = useState(CardDescriptionProp)
 
   const updateCardDescription = () => {
     setMarkdownEditMode(false)
-    console.log('cardDescription:', cardDescription)
+    // console.log('cardDescription:', cardDescription)
+    handleUpdateCardDescription(cardDescription)
   }
 
   return (
@@ -79,8 +81,8 @@ function CardDescriptionEditor() {
               source={cardDescription}
               style={{
                 whiteSpace: 'pre-wrap',
-                padding: '10px',
-                border: '0.5px solid rgba(0, 0, 0, 0.2)',
+                padding: cardDescription ? '10px' : '0px',
+                border: cardDescription ? '0.5px solid rgba(0, 0, 0, 0.2)' : 'none',
                 borderRadius: '8px'
               }}
             />

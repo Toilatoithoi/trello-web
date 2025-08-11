@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
@@ -39,6 +38,7 @@ import {
   updateCurrentActiveCard
 } from '~/redux/activeCard/activeCardSlice'
 import { updateCardDetailsAPI } from '~/apis'
+import { updateCardInBoard } from '~/redux/activeBoard/activeBoardSlice'
 
 import { styled } from '@mui/material/styles'
 const SidebarItem = styled(Box)(({ theme }) => ({
@@ -86,7 +86,7 @@ function ActiveCard() {
     dispatch(updateCurrentActiveCard(updatedCard))
 
     // B2: Cập nhật lại cái bản ghi card trong cái activeBoard(nested data)
-    // dispatch(updateCardInBoard(updatedCard))
+    dispatch(updateCardInBoard(updatedCard))
 
     return updatedCard
   }
@@ -95,8 +95,12 @@ function ActiveCard() {
     callApiUpdateCard({ title: newTitle.trim() })
   }
 
+  const onUpdateCardDescription = (newDescription) => {
+    callApiUpdateCard({ description: newDescription })
+  }
+
   const onUploadCardCover = (event) => {
-    console.log(event.target?.files[0])
+    // console.log(event.target?.files[0])
     const error = singleFileValidator(event.target?.files[0])
     if (error) {
       toast.error(error)
@@ -106,13 +110,16 @@ function ActiveCard() {
     reqData.append('cardCover', event.target?.files[0])
 
     // Gọi API...
+    toast.promise(
+      callApiUpdateCard(reqData).finally(() => event.target.value = ''),
+      { pending: 'Updating...' }
+    )
   }
   return (
     <Modal
       disableScrollLock
       open={true}
-      onClose={handleCloseModal} // Sử dụng onClose trong trường hợp muốn đóng Modal bằng nút
-      ESC hoặc click ra ngoài Modal
+      onClose={handleCloseModal} // Sử dụng onClose trong trường hợp muốn đóng Modal bằng nút ESC hoặc click ra ngoài Modal
       sx={{ overflowY: 'auto' }}>
       <Box sx={{
         position: 'relative',
@@ -122,8 +129,7 @@ function ActiveCard() {
         boxShadow: 24,
         borderRadius: '8px',
         border: 'none',
-        outline:
-          0,
+        outline: 0,
         padding: '40px 20px 20px',
         margin: '50px auto',
         backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1A2027' : '#fff'
@@ -134,8 +140,7 @@ function ActiveCard() {
           right: '10px',
           cursor: 'pointer'
         }}>
-          <CancelIcon color="error" sx={{ '&:hover': { color: 'error.light' } }} onClick=
-            {handleCloseModal} />
+          <CancelIcon color="error" sx={{ '&:hover': { color: 'error.light' } }} onClick={handleCloseModal} />
         </Box>
 
         {activeCard?.cover &&
@@ -178,7 +183,10 @@ function ActiveCard() {
                 >Description</Typography>
               </Box>
               {/* Feature 03: Xử lý mô tả của Card */}
-              <CardDescriptionEditor />
+              <CardDescriptionEditor
+                CardDescriptionProp={activeCard?.description}
+                handleUpdateCardDescription={onUpdateCardDescription}
+              />
             </Box>
 
             <Box sx={{ mb: 3 }}>
