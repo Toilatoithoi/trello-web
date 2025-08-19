@@ -10,6 +10,7 @@ import { FIELD_REQUIRED_MESSAGE, EMAIL_RULE, EMAIL_RULE_MESSAGE } from '~/utils/
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { inviteUserToBoardAPI } from '~/apis'
+import { socketIoInstance } from '~/main'
 
 function InviteBoardUser({ boardId }) {
   /**
@@ -29,13 +30,13 @@ function InviteBoardUser({ boardId }) {
 
     // console.log('inviteeEmail:', inviteeEmail)
     // Gọi API mời một người dùng nào đó vào làm thành viên của Board
-    inviteUserToBoardAPI({ inviteeEmail, boardId }).then(() => {
+    inviteUserToBoardAPI({ inviteeEmail, boardId }).then((invitation) => {
       // Clear the input sử dụng react-hook-form bằng setValue, đống thời đóng popover lại
       setValue('inviteeEmail', null)
       setAnchorPopoverElement(null)
 
-      // Mời một người dùng vào board xong thì cũng sẽ gửi/emít sự kiện socket lên server (tính năng real-time)
-      // ...
+      // Mời một người dùng vào board xong thì cũng sẽ gửi/emít sự kiện socket lên server (tính năng real-time) > FE_USER_INVITED_TO_BOARD
+      socketIoInstance.emit('FE_USER_INVITED_TO_BOARD', invitation)
     })
   }
 
