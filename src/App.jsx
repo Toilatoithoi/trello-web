@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Settings from '~/pages/Settings/Settings'
 import Boards from '~/pages/Boards'
+import AutoCompleteSearchBoard from './components/AppBar/SearchBoards/AutoCompleteSearchBoard'
 
 /**
   * Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới cho truy cập

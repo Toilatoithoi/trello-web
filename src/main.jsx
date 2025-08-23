@@ -29,16 +29,10 @@ const persistor = persistStore(store)
 import { injectStore } from './utils/authorizeAxios'
 injectStore(store)
 
-// Cấu hình Socket-io phía client tại đây và export ra biên socketIoInstance
-// https://socket.io/how-to/use-with-react
-import { io } from 'socket.io-client'
-import { API_ROOT } from '~/utils/constants'
-export const socketIoInstance = io(API_ROOT)
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <PersistGate persistor={persistor}>
-      <BrowserRouter basename='/'>
+      <BrowserRouter basename='/' future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <GlobalStyles styles={{ a: { textDecoration: 'none' } }} />
         <CssVarsProvider theme={theme}>
           <ConfirmProvider defaultOptions={{

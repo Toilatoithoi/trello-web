@@ -10,7 +10,7 @@ import { FIELD_REQUIRED_MESSAGE, EMAIL_RULE, EMAIL_RULE_MESSAGE } from '~/utils/
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { inviteUserToBoardAPI } from '~/apis'
-import { socketIoInstance } from '~/main'
+import { socketIoInstance } from '~/socketClient'
 
 function InviteBoardUser({ boardId }) {
   /**

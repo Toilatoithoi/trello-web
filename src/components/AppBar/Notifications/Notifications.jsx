@@ -15,10 +15,9 @@ import DoneIcon from '@mui/icons-material/Done'
 import NotInterestedIcon from '@mui/icons-material/NotInterested'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchInvitationsAPI, selectCurrentNotifications, updateBoardInvitationAPI, addNotification } from '~/redux/notifications/notificationsSlice'
-import { socketIoInstance } from '~/main'
+import { socketIoInstance } from '~/socketClient'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import { Navigate } from 'react-router-dom'
-import {  useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const BOARD_INVITATION_STATUS = {
   PENDING: 'PENDING',
