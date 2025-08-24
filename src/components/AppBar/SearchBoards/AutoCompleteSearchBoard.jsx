@@ -10,6 +10,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import { createSearchParams, useNavigate } from 'react-router-dom'
+import { fetchBoardsAPI } from '~/apis'
+import { useDebounceFn } from '~/customHooks/useDebounceFn'
 
 /**
  * Hướng dẫn & ví dụ cái Autocomplete của MUI ở đây:
@@ -17,6 +19,8 @@ import { createSearchParams, useNavigate } from 'react-router-dom'
 */
 
 function AutoCompleteSearchBoard() {
+  const navigate = useNavigate()
+
   // State xử lý hiền thì kết quả fetch về từ API
   const [open, setOpen] = useState(false)
   // State lưu trú dành sách board fetch và được
@@ -33,17 +37,34 @@ function AutoCompleteSearchBoard() {
   const handleInputSearchChange = (event) => {
     const searchValue = event.target?.value
     if (!searchValue) return
-    console.log(searchValue)
+    // console.log(searchValue)
+
     // Dùng createSearchParams của react-router-dom để tạo một cái searchPath chuẩn với q[title] để gọi lên API
     const searchPath = `?${createSearchParams({ 'q[title]': searchValue })}`
-    console.log(searchPath)
+    // console.log(searchPath)
+
     // Gọi API...
+    setLoading(true)
+    fetchBoardsAPI(searchPath)
+      .then(res => {
+        setBoards(res.boards || [[]])
+      })
+      .finally(() => {
+        // Lưu ý về việc setLoading về false luôn phải chạy trong finally để dù có lỗi hay không thì cũng không hiện cái loadingb nữa
+        setLoading()
+      })
   }
-  // Làm useDebounceFn...
+
+  // Bọc hàm handleInputSearchChange ở trên vào useDebounceFn và cho delay khoảng 1s sau khi dừng gõ phím thì mới chạy cái function
+  const debounceSearchBoard = useDebounceFn(handleInputSearchChange, 1000)
+
   // Khi chúng ta select chọn một cái board cụ thể thì sẽ điều hướng tới board đó luôn
   const handleSelectedBoard = (event, selectedBoard) => {
     // Phải kiểm tra nếu tồn tại một cái board cụ thể được select thì mới gọi điều hướng - navigate
-    console.log(selectedBoard)
+    // console.log(selectedBoard)
+    if (selectedBoard) {
+      navigate(`/boards/${selectedBoard._id}`)
+    }
   }
 
   return (
@@ -51,19 +72,24 @@ function AutoCompleteSearchBoard() {
       sx={{ width: 220 }}
       id="asynchronous-search-board"
       // Cái text này hiện ra khi boards là null hoặc sau khi đã fetch boards nhưng rồng - không có kế quả
-      nooptionsText={!boards ? 'Type to search board...' : 'No board found!'}
+      noOptionsText={!boards ? 'Type to search board...' : 'No board found!'}
       // Cụm này để handle việc đóng mở phần kết quả tìm kiếm
       open={open}
       onOpen={() => { setOpen(true) }}
       onClose={() => { setOpen(false) }}
+
       // getOptionLabel: để thằng Autocomplete nó lấy title của board và hiển thị ra
       getOptionLabel={(board) => board.title}
+
       // Options của Autocomplete nó cần đầu vào là 1 Array, mà boards của chúng ta ban đầu cần cho null để làm cái nooptionsText ở trên nên đoạn này cần thêm cái || [] vào
       options={boards || []}
+
       // Loading thì đơn giản rồi nhé
       loading={loading}
+
       // onInputChange sẽ chạy khi gõ nội dung vào thẻ input, cần làm debounce để tránh việc bị spam gọi API
-      onInputChange={handleInputSearchChange}
+      onInputChange={debounceSearchBoard}
+
       // onChange của cả cái Autocomplete sẽ chạy khi chúng ta select một cái kết quả (ở đây là board)
       onChange={handleSelectedBoard}
 
